@@ -12,7 +12,9 @@
     "test": "truffle test",
     "dashboard": "truffle dashboard",
     "verify:home-onchain-token:rinkeby": "truffle run verify HomeOnChainToken --network rinkeby",
+    "verify:allowlist:rinkeby": "truffle run verify Allowlist --network rinkeby",
     "verify:home-onchain-token:mainnet": "truffle run verify HomeOnChainToken --network mainnet",
+    "verify:allowlist:mainnet": "truffle run verify Allowlist --network mainnet",
     "verify:migrations:rinkeby": "truffle run verify Migrations --network rinkeby"
   },
   "repository": {
@@ -32,6 +34,7 @@
   },
   "homepage": "https://github.com/RoofstockOnChain/hoc-token#readme",
   "dependencies": {
+    "@openzeppelin/contracts": "^4.7.2",
     "@openzeppelin/contracts-upgradeable": "^4.6.0",
     "@openzeppelin/truffle-upgrades": "^1.15.0",
     "@truffle/hdwallet-provider": "^2.0.8",
