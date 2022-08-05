@@ -1,0 +1,42 @@
+{
+  "name": "hoc-token",
+  "version": "1.0.0",
+  "description": "A modified ERC-721 contract that represents home ownership.",
+  "scripts": {
+    "compile": "truffle compile",
+    "compile:all": "truffle compile --all",
+    "migrate:development": "truffle migrate --network development",
+    "migrate:rinkeby": "truffle migrate --network rinkeby",
+    "migrate:rinkeby:reset": "truffle migrate --network rinkeby --reset",
+    "migrate:dashboard": "truffle migrate --network dashboard",
+    "test": "truffle test",
+    "dashboard": "truffle dashboard",
+    "verify:home-onchain-token:rinkeby": "truffle run verify HomeOnChainToken --network rinkeby",
+    "verify:home-onchain-token:mainnet": "truffle run verify HomeOnChainToken --network mainnet",
+    "verify:migrations:rinkeby": "truffle run verify Migrations --network rinkeby"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RoofstockOnChain/hoc-token.git"
+  },
+  "keywords": [
+    "roofstock",
+    "truffle",
+    "smart-contract",
+    "ERC-721"
+  ],
+  "author": "Roofstock onChain",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RoofstockOnChain/hoc-token/issues"
+  },
+  "homepage": "https://github.com/RoofstockOnChain/hoc-token#readme",
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "^4.6.0",
+    "@openzeppelin/truffle-upgrades": "^1.15.0",
+    "@truffle/hdwallet-provider": "^2.0.8",
+    "dotenv": "^16.0.1",
+    "truffle": "^5.5.15",
+    "truffle-plugin-verify": "^0.5.25"
+  }
+}
