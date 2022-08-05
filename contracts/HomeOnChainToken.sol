@@ -11,7 +11,7 @@ import "./extensions/ERC721Burnable.sol";
 import "./extensions/ERC721Mintable.sol";
 
 contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable, ERC721AllowlistTransfer, ERC721BaseURI, ERC721Mintable, ERC721Burnable {
-    function initialize()
+    function initialize(address allowlistContractAddress)
         initializer
         public
     {
@@ -21,6 +21,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         __AccessControl_init();
         __ERC721Mintable_init();
         __ERC721Burnable_init();
+        __ERC721AllowlistTransfer_init(allowlistContractAddress);
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }

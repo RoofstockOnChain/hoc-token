@@ -6,6 +6,24 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 abstract contract ERC721AllowlistTransfer is Initializable, ERC721Upgradeable, AccessControlUpgradeable {
+    address private _allowlistContractAddress;
+
+    function __ERC721AllowlistTransfer_init(address allowlistContractAddress)
+        internal
+        onlyInitializing
+    {
+        require(allowlistContractAddress != address(0), "ERC721AllowlistTransfer: Allowlist smart contract address must exist");
+        _allowlistContractAddress = allowlistContractAddress;
+    }
+
+    function setAllowlistContractAddress(address allowlistContractAddress)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        require(allowlistContractAddress != address(0), "ERC721AllowlistTransfer: Allowlist smart contract address must exist");
+        _allowlistContractAddress = allowlistContractAddress;
+    }
+
     function transferFrom(address from, address to, uint256 tokenId)
         public
         virtual
