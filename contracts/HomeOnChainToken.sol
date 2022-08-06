@@ -98,7 +98,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         return allowlistContract.isAllowed(_address);
     }
 
-    function setSellable(uint256 tokenId, uint256 expiration)
+    function setSellableExpiration(uint256 tokenId, uint256 expiration)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
