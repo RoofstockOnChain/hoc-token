@@ -5,25 +5,113 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "./extensions/ERC721AllowlistTransfer.sol";
-import "./extensions/ERC721BaseURI.sol";
-import "./extensions/ERC721Burnable.sol";
-import "./extensions/ERC721Mintable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "./Allowlist.sol";
 
-contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable, ERC721AllowlistTransfer, ERC721BaseURI, ERC721Mintable, ERC721Burnable {
+contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable {
+    using CountersUpgradeable for CountersUpgradeable.Counter;
+    CountersUpgradeable.Counter private _tokenIdCounter;
+
+    string private _baseTokenURI;
+    address private _allowlistContractAddress;
+    event AllowlistContractAddressChanged(address indexed allowlistContractAddress);
+
+    mapping(uint256 => uint256) private sellable;
+
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
+
     function initialize(address allowlistContractAddress)
         initializer
         public
     {
         __ERC721_init("Home onChain", "HoC");
-        __ERC721BaseURI_init("https://onchain.roofstock.com/metadata/");
         __ERC721Enumerable_init();
         __AccessControl_init();
-        __ERC721Mintable_init();
-        __ERC721Burnable_init();
-        __ERC721AllowlistTransfer_init(allowlistContractAddress);
+
+        _baseTokenURI = "https://onchain.roofstock.com/metadata/";
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(MINTER_ROLE, msg.sender);
+        _grantRole(BURNER_ROLE, msg.sender);
+
+        setAllowlistContractAddress(allowlistContractAddress);
+    }
+
+    function mint(address to)
+        public
+        onlyRole(MINTER_ROLE)
+    {
+        require(isAllowed(to), "HomeOnChainToken: To address must be on the allowlist");
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(to, tokenId);
+    }
+
+    function burn(uint256 tokenId)
+        public
+        virtual
+        onlyRole(BURNER_ROLE)
+    {
+        _burn(tokenId);
+    }
+
+    function setAllowlistContractAddress(address allowlistContractAddress)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        require(allowlistContractAddress != address(0), "HomeOnChainToken: Allowlist smart contract address must exist");
+        _allowlistContractAddress = allowlistContractAddress;
+        emit AllowlistContractAddressChanged(allowlistContractAddress);
+    }
+
+    function _baseURI()
+        internal
+        view
+        override(ERC721Upgradeable)
+        returns (string memory)
+    {
+        return _baseTokenURI;
+    }
+
+    function setBaseURI(string memory baseTokenURI)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _baseTokenURI = baseTokenURI;
+    }
+
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+        internal
+        override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
+    {
+        require(isAllowed(to), "HomeOnChainToken: To address must be on the allowlist");
+        require(isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable.");
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function isAllowed(address _address)
+        private
+        view
+        returns (bool)
+    {
+        Allowlist allowlistContract = Allowlist(_allowlistContractAddress);
+        return allowlistContract.isAllowed(_address);
+    }
+
+    function setSellable(uint256 tokenId, uint256 expiration)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        sellable[tokenId] = expiration;
+    }
+
+    function isSellable(uint256 tokenId)
+        private
+        view
+        returns (bool)
+    {
+        return sellable[tokenId] > block.timestamp;
     }
 
     // The following functions are overrides required by Solidity.
@@ -31,39 +119,9 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable, ERC721AllowlistTransfer, ERC721BaseURI, ERC721Mintable, ERC721Burnable)
+        override(ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
-    }
-
-    function transferFrom(address from, address to, uint256 tokenId)
-        public
-        override(ERC721AllowlistTransfer, ERC721Upgradeable, IERC721Upgradeable)
-    {
-        super.transferFrom(from, to, tokenId);
-    }
-
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data)
-        public
-        override(ERC721AllowlistTransfer, ERC721Upgradeable, IERC721Upgradeable)
-    {
-        return super.safeTransferFrom(from, to, tokenId, _data);
-    }
-
-    function _baseURI()
-        internal
-        view
-        override(ERC721BaseURI, ERC721Upgradeable)
-        returns (string memory)
-    {
-        return super._baseURI();
-    }
-
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
-        internal
-        override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
-    {
-        super._beforeTokenTransfer(from, to, tokenId);
     }
 }
