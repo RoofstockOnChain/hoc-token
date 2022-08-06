@@ -42,7 +42,6 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         public
         onlyRole(MINTER_ROLE)
     {
-        require(isAllowed(to), "HomeOnChainToken: To address must be on the allowlist");
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
@@ -86,7 +85,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
         require(isAllowed(to), "HomeOnChainToken: To address must be on the allowlist");
-        require(isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable.");
+        require(from != address(0) && isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable.");
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
