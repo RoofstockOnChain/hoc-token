@@ -85,7 +85,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
         require(isAllowed(to), "HomeOnChainToken: To address must be on the allowlist");
-        require(from != address(0) && isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable.");
+        require(from == address(0) || isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable.");
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
