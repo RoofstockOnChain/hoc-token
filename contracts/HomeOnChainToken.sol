@@ -105,6 +105,14 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         sellable[tokenId] = expiration;
     }
 
+    function getSellableExpiration(uint256 tokenId)
+        public
+        view
+        returns (uint256)
+    {
+        return sellable[tokenId];
+    }
+
     function isSellable(uint256 tokenId)
         private
         view

@@ -12,6 +12,10 @@ contract Allowlist is Ownable {
         return allowed[_address] > block.timestamp;
     }
 
+    function getExpiration(address _address) public view returns(uint256) {
+        return allowed[_address];
+    }
+
     function allow(address _address, uint256 expiration) public onlyOwner {
         allowed[_address] = expiration;
         emit Allowed(_address);
