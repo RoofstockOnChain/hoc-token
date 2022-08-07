@@ -6,9 +6,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "./Allowlist.sol";
 
-contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable {
+contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable, PausableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter private _tokenIdCounter;
 
@@ -20,6 +21,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
+    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
     function initialize(address allowlistContractAddress)
         initializer
@@ -64,6 +66,20 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         emit AllowlistContractAddressChanged(allowlistContractAddress);
     }
 
+    function pause()
+        public
+        onlyRole(PAUSER_ROLE)
+    {
+        _pause();
+    }
+
+    function unpause()
+        public 
+        onlyRole(PAUSER_ROLE)
+    {
+        _unpause();
+    }
+
     function _baseURI()
         internal
         view
@@ -82,6 +98,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId)
         internal
+        whenNotPaused
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
         require(isAllowed(to), "HomeOnChainToken: To address must be on the allowlist");
