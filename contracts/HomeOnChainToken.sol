@@ -18,6 +18,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     event AllowlistContractAddressChanged(address indexed allowlistContractAddress);
 
     mapping(uint256 => uint256) private sellable;
+    event SellableExpirationChanged(uint256 indexed tokenId, uint256 indexed expiration);
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
@@ -103,7 +104,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
         require(to == address(0) || isAllowed(to), "HomeOnChainToken: To address must be on the allowlist");
-        require(from == address(0) || isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable.");
+        require(from == address(0) || isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable");
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
@@ -120,7 +121,9 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
+        require(_exists(tokenId), "HomeOnChainToken: TokenId must exist");
         sellable[tokenId] = expiration;
+        emit SellableExpirationChanged(tokenId, expiration);
     }
 
     function getSellableExpiration(uint256 tokenId)
