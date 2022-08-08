@@ -36,6 +36,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
         _grantRole(BURNER_ROLE, msg.sender);
+        _grantRole(PAUSER_ROLE, msg.sender);
 
         setAllowlistContractAddress(allowlistContractAddress);
     }
