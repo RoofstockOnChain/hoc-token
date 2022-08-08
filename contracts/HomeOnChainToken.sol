@@ -10,6 +10,8 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "./Allowlist.sol";
 
+/// @title A non-fungible token that represents ownership of a home.
+/// @author Roofstock onChain team
 contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable, PausableUpgradeable, ERC721BurnableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter private _tokenIdCounter;
@@ -25,6 +27,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant SELLABLE_GRANTOR_ROLE = keccak256("SELLABLE_GRANTOR_ROLE");
 
+    /// @notice Initializes the contract.
+    /// @param allowlistContractAddress The default value of the allowlist contract address.
     function initialize(address allowlistContractAddress)
         initializer
         public
@@ -43,6 +47,9 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         setAllowlistContractAddress(allowlistContractAddress);
     }
 
+    /// @notice Mints new tokens.
+    /// @dev Only Roofstock onChain can mint new tokens.
+    /// @param to The address that will own the token after the mint is complete.
     function mint(address to)
         public
         onlyRole(MINTER_ROLE)
@@ -52,6 +59,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         _safeMint(to, tokenId);
     }
 
+    /// @notice Sets the contract address for the allowlist.
+    /// @param allowlistContractAddress The new allowlist contract address.
     function setAllowlistContractAddress(address allowlistContractAddress)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
@@ -61,6 +70,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         emit AllowlistContractAddressChanged(allowlistContractAddress);
     }
 
+    /// @notice Pauses transfers on the contract.
+    /// @dev Can be called by Roofstock onChain to halt transfers.
     function pause()
         public
         onlyRole(PAUSER_ROLE)
@@ -68,6 +79,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         _pause();
     }
 
+    /// @notice Unpauses transfers on the contract.
+    /// @dev Can be called by Roofstock onChain to resume transfers.
     function unpause()
         public 
         onlyRole(PAUSER_ROLE)
@@ -75,6 +88,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         _unpause();
     }
 
+    /// @notice Gets the base URI for all tokens.
+    /// @return The token base URI.
     function _baseURI()
         internal
         view
@@ -84,6 +99,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         return _baseTokenURI;
     }
 
+    /// @notice Sets the base URI for all tokens.
+    /// @param baseTokenURI The new base URI.
     function setBaseURI(string memory baseTokenURI)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
@@ -91,6 +108,11 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         _baseTokenURI = baseTokenURI;
     }
 
+    /// @notice Override that is called before all transfers.
+    /// @dev Verifies that the recipient is on the allowlist (unless burning) and the token is sellable (unless minting).
+    /// @param from The address where the token is coming from.
+    /// @param to The address where the token is going to.
+    /// @param tokenId The id of the token
     function _beforeTokenTransfer(address from, address to, uint256 tokenId)
         internal
         whenNotPaused
@@ -101,6 +123,9 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
+    /// @notice Checks against the accompanied Allowlist contract.
+    /// @param _address The address that you want to check.
+    /// @return Whether the address is on the allowlist.
     function isAllowed(address _address)
         private
         view
@@ -110,6 +135,10 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         return allowlistContract.isAllowed(_address);
     }
 
+    /// @notice Sets the date the token is sellable until.
+    /// @dev Can only be set by Roofstock onChain after we verify the property is in good standing.
+    /// @param tokenId The token for which the expiration is set.
+    /// @param expiration The expiration date.
     function setSellableExpiration(uint256 tokenId, uint256 expiration)
         public
         onlyRole(SELLABLE_GRANTOR_ROLE)
@@ -119,6 +148,9 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         emit SellableExpirationChanged(tokenId, expiration);
     }
 
+    /// @notice Gets the date for which the token can no longer be sold.
+    /// @param tokenId The token for which the expiration inquiry is made.
+    /// @return The date that the token expires.
     function getSellableExpiration(uint256 tokenId)
         public
         view
@@ -127,6 +159,9 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         return sellable[tokenId];
     }
 
+    /// @notice Gets whether a token is currently available to sell.
+    /// @param tokenId The token to check sellability.
+    /// @return A boolean that represents whether the token is sellable.
     function isSellable(uint256 tokenId)
         private
         view
