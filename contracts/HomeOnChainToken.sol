@@ -7,9 +7,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "./Allowlist.sol";
 
-contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable, PausableUpgradeable {
+contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable, PausableUpgradeable, ERC721BurnableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter private _tokenIdCounter;
 
@@ -21,7 +22,6 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     event SellableExpirationChanged(uint256 indexed tokenId, uint256 indexed expiration);
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant SELLABLE_GRANTOR_ROLE = keccak256("SELLABLE_GRANTOR_ROLE");
 
@@ -37,7 +37,6 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
-        _grantRole(BURNER_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(SELLABLE_GRANTOR_ROLE, msg.sender);
 
@@ -51,14 +50,6 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
-    }
-
-    function burn(uint256 tokenId)
-        public
-        virtual
-        onlyRole(BURNER_ROLE)
-    {
-        _burn(tokenId);
     }
 
     function setAllowlistContractAddress(address allowlistContractAddress)
