@@ -23,6 +23,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    bytes32 public constant SELLABLE_GRANTOR_ROLE = keccak256("SELLABLE_GRANTOR_ROLE");
 
     function initialize(address allowlistContractAddress)
         initializer
@@ -38,6 +39,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         _grantRole(MINTER_ROLE, msg.sender);
         _grantRole(BURNER_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
+        _grantRole(SELLABLE_GRANTOR_ROLE, msg.sender);
 
         setAllowlistContractAddress(allowlistContractAddress);
     }
@@ -119,7 +121,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
 
     function setSellableExpiration(uint256 tokenId, uint256 expiration)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyRole(SELLABLE_GRANTOR_ROLE)
     {
         require(_exists(tokenId), "HomeOnChainToken: TokenId must exist");
         sellable[tokenId] = expiration;
