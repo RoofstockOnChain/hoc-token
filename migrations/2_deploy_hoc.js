@@ -1,10 +1,10 @@
 const { deployProxy } = require("@openzeppelin/truffle-upgrades");
 
-const Allowlist = artifacts.require("Allowlist");
+const KycOnChainToken = artifacts.require("KycOnChainToken");
 const HomeOnChainToken = artifacts.require("HomeOnChainToken");
 
 module.exports = async function (deployer) {
-  await deployer.deploy(Allowlist);
-  const allowlistInstance = await Allowlist.deployed();
-  await deployProxy(HomeOnChainToken, [ allowlistInstance.address ], { deployer });
+  await deployer.deploy(KycOnChainToken);
+  const kycOnChainTokenInstance = await KycOnChainToken.deployed();
+  await deployProxy(HomeOnChainToken, [ kycOnChainTokenInstance.address ], { deployer });
 };

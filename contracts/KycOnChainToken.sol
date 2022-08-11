@@ -10,6 +10,8 @@ import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 
 error NotSupported();
 
+/// @title A soulbound token that you get once you KYC with Roofstock onChain that allows you to receive Home onChain tokens.
+/// @author Roofstock onChain team
 contract KycOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, PausableUpgradeable, AccessControlUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter private _tokenIdCounter;
@@ -55,6 +57,10 @@ contract KycOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUp
         onlyRole(BURNER_ROLE)
     {
         _burn(tokenId);
+    }
+
+    function isAllowed(address _address) public view returns(bool) {
+        return expirations[_address] > block.timestamp;
     }
 
     function getExpiration(address _address)

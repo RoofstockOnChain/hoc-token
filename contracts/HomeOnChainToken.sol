@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
-import "./Allowlist.sol";
+import "./KycOnChainToken.sol";
 
 /// @title A non-fungible token that represents ownership of a home.
 /// @author Roofstock onChain team
@@ -17,8 +17,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     CountersUpgradeable.Counter private _tokenIdCounter;
 
     string private _baseTokenURI;
-    address private _allowlistContractAddress;
-    event AllowlistContractAddressChanged(address indexed allowlistContractAddress);
+    address private _kycOnChainTokenContractAddress;
+    event KycOnChainTokenContractAddressChanged(address indexed kycOnChainTokenContractAddress);
 
     mapping(uint256 => uint256) private sellable;
     event SellableExpirationChanged(uint256 indexed tokenId, uint256 indexed expiration);
@@ -28,8 +28,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     bytes32 public constant SELLABLE_GRANTOR_ROLE = keccak256("SELLABLE_GRANTOR_ROLE");
 
     /// @notice Initializes the contract.
-    /// @param allowlistContractAddress The default value of the allowlist contract address.
-    function initialize(address allowlistContractAddress)
+    /// @param kycOnChainTokenContractAddress The default value of the KYC onChain Token contract address.
+    function initialize(address kycOnChainTokenContractAddress)
         initializer
         public
     {
@@ -46,7 +46,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(SELLABLE_GRANTOR_ROLE, msg.sender);
 
-        setAllowlistContractAddress(allowlistContractAddress);
+        setKycOnChainTokenContractAddress(kycOnChainTokenContractAddress);
     }
 
     /// @notice Mints new tokens.
@@ -61,15 +61,15 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         _safeMint(to, tokenId);
     }
 
-    /// @notice Sets the contract address for the allowlist.
-    /// @param allowlistContractAddress The new allowlist contract address.
-    function setAllowlistContractAddress(address allowlistContractAddress)
+    /// @notice Sets the contract address for the KycOnChainToken.
+    /// @param kycOnChainTokenContractAddress The new KYC onChainToken contract address.
+    function setKycOnChainTokenContractAddress(address kycOnChainTokenContractAddress)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
-        require(allowlistContractAddress != address(0), "HomeOnChainToken: Allowlist smart contract address must exist");
-        _allowlistContractAddress = allowlistContractAddress;
-        emit AllowlistContractAddressChanged(allowlistContractAddress);
+        require(kycOnChainTokenContractAddress != address(0), "HomeOnChainToken: KycOnChainToken smart contract address must exist");
+        _kycOnChainTokenContractAddress = kycOnChainTokenContractAddress;
+        emit KycOnChainTokenContractAddressChanged(kycOnChainTokenContractAddress);(kycOnChainTokenContractAddress);
     }
 
     /// @notice Pauses transfers on the contract.
@@ -111,7 +111,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     }
 
     /// @notice Override that is called before all transfers.
-    /// @dev Verifies that the recipient is on the allowlist (unless burning) and the token is sellable (unless minting).
+    /// @dev Verifies that the recipient owns a KYC onChain token (unless burning) and the token is sellable (unless minting).
     /// @param from The address where the token is coming from.
     /// @param to The address where the token is going to.
     /// @param tokenId The id of the token
@@ -120,21 +120,21 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         whenNotPaused
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
-        require(to == address(0) || isAllowed(to), "HomeOnChainToken: To address must be on the allowlist");
+        require(to == address(0) || isAllowed(to), "HomeOnChainToken: To address must own a KYC onChain token");
         require(from == address(0) || isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable");
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    /// @notice Checks against the accompanied Allowlist contract.
+    /// @notice Checks against the accompanied KYC onChain token contract.
     /// @param _address The address that you want to check.
-    /// @return Whether the address is on the allowlist.
+    /// @return Whether the address owns the KYC onChain token.
     function isAllowed(address _address)
         private
         view
         returns (bool)
     {
-        Allowlist allowlistContract = Allowlist(_allowlistContractAddress);
-        return allowlistContract.isAllowed(_address);
+        KycOnChainToken kycOnChainTokenContract = KycOnChainToken(_kycOnChainTokenContractAddress);
+        return kycOnChainTokenContract.isAllowed(_address);
     }
 
     /// @notice Sets the date the token is sellable until.

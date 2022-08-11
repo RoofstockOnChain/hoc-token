@@ -12,9 +12,9 @@
     "test": "truffle test",
     "dashboard": "truffle dashboard",
     "verify:home-onchain-token:rinkeby": "truffle run verify HomeOnChainToken --network rinkeby",
-    "verify:allowlist:rinkeby": "truffle run verify Allowlist --network rinkeby",
+    "verify:kyc-onchain-token:rinkeby": "truffle run verify KycOnChainToken --network rinkeby",
     "verify:home-onchain-token:mainnet": "truffle run verify HomeOnChainToken --network mainnet",
-    "verify:allowlist:mainnet": "truffle run verify Allowlist --network mainnet",
+    "verify:kyc-onchain-token:mainnet": "truffle run verify KycOnChainToken --network mainnet",
     "verify:migrations:rinkeby": "truffle run verify Migrations --network rinkeby",
     "verify:migrations:mainnet": "truffle run verify Migrations --network mainnet"
   },
