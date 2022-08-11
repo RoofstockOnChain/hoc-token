@@ -36,6 +36,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         __ERC721_init("Home onChain", "HoC");
         __ERC721Enumerable_init();
         __AccessControl_init();
+        __Pausable_init();
+        __ERC721Burnable_init();
 
         _baseTokenURI = "https://onchain.roofstock.com/metadata/";
 
