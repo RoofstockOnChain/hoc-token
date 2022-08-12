@@ -40,6 +40,7 @@
     "@openzeppelin/truffle-upgrades": "^1.15.0",
     "@truffle/hdwallet-provider": "^2.0.8",
     "dotenv": "^16.0.1",
+    "erc721a-upgradeable": "^4.2.1",
     "truffle": "^5.5.15",
     "truffle-plugin-verify": "^0.5.25"
   }

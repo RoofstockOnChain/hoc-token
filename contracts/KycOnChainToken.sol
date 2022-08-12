@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import 'erc721a-upgradeable/contracts/ERC721AUpgradeable.sol';
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -12,7 +11,7 @@ error NotSupported();
 
 /// @title A soulbound token that you get once you KYC with Roofstock onChain that allows you to receive Home onChain tokens.
 /// @author Roofstock onChain team
-contract KycOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, PausableUpgradeable, AccessControlUpgradeable {
+contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeable, AccessControlUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter private _tokenIdCounter;
 
@@ -29,8 +28,7 @@ contract KycOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUp
         initializer
         public
     {
-        __ERC721_init("KycOnChainToken", "KYC");
-        __ERC721Enumerable_init();
+        __ERC721A_init('KycOnChainToken', 'KYC');
         __Pausable_init();
         __AccessControl_init();
 
@@ -103,7 +101,7 @@ contract KycOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUp
     function _baseURI()
         internal
         view
-        override(ERC721Upgradeable)
+        override
         returns (string memory)
     {
         return _baseTokenURI;
@@ -116,76 +114,55 @@ contract KycOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUp
         _baseTokenURI = baseTokenURI;
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
-        internal
-        override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
-    {
-        super._beforeTokenTransfer(from, to, tokenId);
-    }
-
-    function transferFrom(address from, address to, uint256 tokenId)
+    function transferFrom(address, address, uint256)
         public
         virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
+        override
     {
-        from;
-        to;
-        tokenId;
         revert NotSupported();
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data)
+    function safeTransferFrom(address, address, uint256, bytes memory)
         public
         virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
+        override
     {
-        from;
-        to;
-        tokenId;
-        _data;
         revert NotSupported();
     }
 
-    function approve(address to, uint256 tokenId)
+    function approve(address, uint256)
         public
         virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
+        override
     {
-        to;
-        tokenId;
         revert NotSupported();
     }
 
-    function getApproved(uint256 tokenId)
+    function getApproved(uint256)
         public
         view
         virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
+        override
         returns (address)
     {
-        tokenId;
         revert NotSupported();
     }
 
-    function isApprovedForAll(address owner, address operator)
+    function isApprovedForAll(address, address)
         public
         view
         virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
+        override
         returns (bool)
     {
-        owner;
-        operator;
         revert NotSupported();
     }
 
-    function setApprovalForAll(address operator, bool approved)
+    function setApprovalForAll(address, bool)
         public
         virtual
-        override(ERC721Upgradeable, IERC721Upgradeable)
+        override
     {
-        operator;
-        approved;
         revert NotSupported();
     }
 
@@ -194,7 +171,7 @@ contract KycOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUp
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable)
+        override(ERC721AUpgradeable, AccessControlUpgradeable)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
