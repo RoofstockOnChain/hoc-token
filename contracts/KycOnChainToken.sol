@@ -12,9 +12,6 @@ error NotSupported();
 /// @title A soulbound token that you get once you KYC with Roofstock onChain that allows you to receive Home onChain tokens.
 /// @author Roofstock onChain team
 contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeable, AccessControlUpgradeable {
-    using CountersUpgradeable for CountersUpgradeable.Counter;
-    CountersUpgradeable.Counter private _tokenIdCounter;
-
     string private _baseTokenURI;
 
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
@@ -25,6 +22,7 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
     event ExpirationUpdated(address indexed _address, uint256 indexed expiration);
 
     function initialize()
+        initializerERC721A
         initializer
         public
     {
@@ -44,9 +42,7 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
         public
         onlyRole(KYC_ROLE)
     {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
+        _mint(to, 1);
         setExpiration(to, expiration);
     }
 
