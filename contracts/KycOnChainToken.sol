@@ -150,7 +150,6 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
     /// @param quantity The number of tokens that are being transferred.
     function _beforeTokenTransfers(address from, address to, uint256 startTokenId, uint256 quantity)
         internal
-        virtual
         override
         whenNotPaused
     {
@@ -160,7 +159,7 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
     /// @dev This function is not allowed because we want the token to be soulbound.
     function transferFrom(address, address, uint256)
         public
-        virtual
+        pure
         override
     {
         revert NotSupported();
@@ -169,7 +168,7 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
     /// @dev This function is not allowed because we want the token to be soulbound.
     function safeTransferFrom(address, address, uint256, bytes memory)
         public
-        virtual
+        pure
         override
     {
         revert NotSupported();
@@ -178,7 +177,7 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
     /// @dev This function is not allowed because we want the token to be soulbound.
     function approve(address, uint256)
         public
-        virtual
+        pure
         override
     {
         revert NotSupported();
@@ -187,8 +186,7 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
     /// @dev This function is not allowed because we want the token to be soulbound.
     function getApproved(uint256)
         public
-        view
-        virtual
+        pure
         override
         returns (address)
     {
@@ -198,8 +196,7 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
     /// @dev This function is not allowed because we want the token to be soulbound.
     function isApprovedForAll(address, address)
         public
-        view
-        virtual
+        pure
         override
         returns (bool)
     {
@@ -209,7 +206,7 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
     /// @dev This function is not allowed because we want the token to be soulbound.
     function setApprovalForAll(address, bool)
         public
-        virtual
+        pure
         override
     {
         revert NotSupported();
@@ -218,10 +215,13 @@ contract KycOnChainToken is Initializable, ERC721AUpgradeable, PausableUpgradeab
     /// @dev The following functions are overrides required by Solidity.
     function supportsInterface(bytes4 interfaceId)
         public
-        view
+        pure
         override(ERC721AUpgradeable, AccessControlUpgradeable)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return
+            interfaceId == 0x01ffc9a7 || // ERC165 interface ID for ERC165.
+            interfaceId == 0x80ac58cd || // ERC165 interface ID for ERC721.
+            interfaceId == 0x5b5e139f; // ERC165 interface ID for ERC721Metadata.
     }
 }
