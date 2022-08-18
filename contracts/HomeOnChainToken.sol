@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
-import "./KycOnChainToken.sol";
+import "./IKyc.sol";
 
 /// @title A non-fungible token that represents ownership of a home.
 /// @author Roofstock onChain team
@@ -17,8 +17,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     CountersUpgradeable.Counter private _tokenIdCounter;
 
     string private _baseTokenURI;
-    address private _kycOnChainTokenContractAddress;
-    event KycOnChainTokenContractAddressChanged(address indexed kycOnChainTokenContractAddress);
+    address private _kycContractAddress;
+    event KycContractAddressChanged(address indexed kycContractAddress);
 
     mapping(uint256 => uint256) private sellable;
     event SellableExpirationChanged(uint256 indexed tokenId, uint256 indexed expiration);
@@ -28,8 +28,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     bytes32 public constant SELLABLE_GRANTOR_ROLE = keccak256("SELLABLE_GRANTOR_ROLE");
 
     /// @notice Initializes the contract.
-    /// @param kycOnChainTokenContractAddress The default value of the KYC onChain Token contract address.
-    function initialize(address kycOnChainTokenContractAddress)
+    /// @param kycContractAddress The default value of the KYC onChain Token contract address.
+    function initialize(address kycContractAddress)
         initializer
         public
     {
@@ -41,12 +41,12 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
 
         _baseTokenURI = "https://onchain.roofstock.com/metadata/";
 
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(MINTER_ROLE, msg.sender);
-        _grantRole(PAUSER_ROLE, msg.sender);
-        _grantRole(SELLABLE_GRANTOR_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _grantRole(MINTER_ROLE, _msgSender());
+        _grantRole(PAUSER_ROLE, _msgSender());
+        _grantRole(SELLABLE_GRANTOR_ROLE, _msgSender());
 
-        setKycOnChainTokenContractAddress(kycOnChainTokenContractAddress);
+        setKycContractAddress(kycContractAddress);
     }
 
     /// @notice Mints new tokens.
@@ -61,15 +61,15 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         _safeMint(to, tokenId);
     }
 
-    /// @notice Sets the contract address for the KycOnChainToken.
-    /// @param kycOnChainTokenContractAddress The new KYC onChainToken contract address.
-    function setKycOnChainTokenContractAddress(address kycOnChainTokenContractAddress)
+    /// @notice Sets the contract address for the KYC contract.
+    /// @param kycContractAddress The new KYC contract address.
+    function setKycContractAddress(address kycContractAddress)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
-        require(kycOnChainTokenContractAddress != address(0), "HomeOnChainToken: KycOnChainToken smart contract address must exist");
-        _kycOnChainTokenContractAddress = kycOnChainTokenContractAddress;
-        emit KycOnChainTokenContractAddressChanged(kycOnChainTokenContractAddress);(kycOnChainTokenContractAddress);
+        require(kycContractAddress != address(0), "HomeOnChainToken: KYC smart contract address must exist");
+        _kycContractAddress = kycContractAddress;
+        emit KycContractAddressChanged(kycContractAddress);
     }
 
     /// @notice Pauses transfers on the contract.
@@ -133,8 +133,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         view
         returns (bool)
     {
-        KycOnChainToken kycOnChainTokenContract = KycOnChainToken(_kycOnChainTokenContractAddress);
-        return kycOnChainTokenContract.isAllowed(_address);
+        IKyc kycContract = IKyc(_kycContractAddress);
+        return kycContract.isAllowed(_address);
     }
 
     /// @notice Sets the date the token is sellable until.

@@ -12,9 +12,9 @@
     "test": "truffle test",
     "dashboard": "truffle dashboard",
     "verify:home-onchain-token:rinkeby": "truffle run verify HomeOnChainToken --network rinkeby",
-    "verify:kyc-onchain-token:rinkeby": "truffle run verify KycOnChainToken --network rinkeby",
+    "verify:roofstock-onchain-membership-token:rinkeby": "truffle run verify RoofstockOnChainMembershipToken --network rinkeby",
     "verify:home-onchain-token:mainnet": "truffle run verify HomeOnChainToken --network mainnet",
-    "verify:kyc-onchain-token:mainnet": "truffle run verify KycOnChainToken --network mainnet"
+    "verify:roofstock-onchain-membership-token:mainnet": "truffle run verify RoofstockOnChainMembershipToken --network mainnet"
   },
   "repository": {
     "type": "git",
