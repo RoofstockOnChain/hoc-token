@@ -120,7 +120,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         whenNotPaused
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
-        require(to == address(0) || isAllowed(to), "HomeOnChainToken: To address must own a KYC onChain token");
+        require(to == address(0) || isAllowed(to), "HomeOnChainToken: To address must own a Roofstock onChain Membership token");
         require(from == address(0) || to == address(0) || isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable");
         super._beforeTokenTransfer(from, to, tokenId);
     }
