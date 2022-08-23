@@ -72,6 +72,15 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         emit KycContractAddressChanged(kycContractAddress);
     }
 
+    /// @notice Gets the contract address for the KYC contract.
+    function getKycContractAddress()
+        external
+        view
+        returns (address)
+    {
+        return _kycContractAddress;
+    }
+
     /// @notice Pauses transfers on the contract.
     /// @dev Can be called by Roofstock onChain to halt transfers.
     function pause()
@@ -129,7 +138,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     /// @param _address The address that you want to check.
     /// @return Whether the address owns the KYC onChain token.
     function isAllowed(address _address)
-        private
+        public
         view
         returns (bool)
     {
