@@ -9,6 +9,7 @@
     "migrate:rinkeby": "truffle migrate --network rinkeby",
     "migrate:rinkeby:reset": "truffle migrate --network rinkeby --reset",
     "migrate:dashboard": "truffle migrate --network dashboard",
+    "migrate:dashboard:reset": "truffle migrate --network dashboard --reset",
     "test": "truffle test",
     "dashboard": "truffle dashboard",
     "verify:home-onchain-token:rinkeby": "truffle run verify HomeOnChainToken --network rinkeby",
