@@ -79,15 +79,15 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
         _burn(tokenId, false);
     }
 
-    /// @notice Checks to see if the address has a token.
+    /// @notice Checks to see if the address has a token and is KYC'd.
     /// @param _address The address that you want to check.
-    /// @return Whether the address has has a token.
+    /// @return Whether the address has has a token and it is KYC'd.
     function isAllowed(address _address)
         public
         view
         returns(bool)
     {
-        return kyc[_address];
+        return balanceOf(_address) > 0 && kyc[_address];
     }
 
     /// @notice Sets the KYC for an address.
