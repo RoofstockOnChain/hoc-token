@@ -129,8 +129,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         whenNotPaused
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
-        require(to == address(0) || isAllowed(to), "HomeOnChainToken: To address must own a Roofstock onChain Membership token");
-        require(from == address(0) || to == address(0) || isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable");
+        require(to == address(0) || isAllowed(to), "HomeOnChainToken: To address must own a Roofstock onChain Membership token and be KYC'd. Go to https://onchain.roofstock.com/kyc for more details.");
+        require(from == address(0) || to == address(0) || isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable. Go to https://onchain.roofstock.com/sell for more details.");
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
@@ -142,8 +142,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         view
         returns (bool)
     {
-        IKyc kycContract = IKyc(_kycContractAddress);
-        return kycContract.isAllowed(_address);
+        return IKyc(_kycContractAddress).isAllowed(_address);
     }
 
     /// @notice Sets the date the token is sellable until.
