@@ -13,6 +13,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
     string private _baseTokenURI;
 
     mapping(address => bool) private kyc;
+    mapping(address => uint256) private _ownedToken;
 
     /// @notice Initializes the contract.
     function initialize()
@@ -100,6 +101,17 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
         kyc[_address] = isKyc;
     }
 
+    /// @notice Determines the token id for a user.
+    /// @param owner The address for which to get the token id.
+    /// @return The token id for the given address.
+    function tokenOfOwner(address owner)
+        public
+        view
+        returns (uint256)
+    {
+        return _ownedToken[owner];
+    }
+
     /// @notice Gets the base URI for all tokens.
     /// @return The token base URI.
     function _baseURI()
@@ -118,6 +130,25 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
         onlyOwner
     {
         _baseTokenURI = baseTokenURI;
+    }
+
+    /// @notice Override that happens before all transfers.
+    /// @dev Since this token is soulbound, it only happens on mint and burn
+    /// @param from The address the token is transferred from.
+    /// @param to The address the token is transferred to.
+    /// @param tokenId The id of the token.
+    /// @param quantity The number of tokens that are being transferred.
+    function _beforeTokenTransfers(address from, address to, uint256 tokenId, uint256 quantity)
+        internal
+        override
+    {
+        if (to == address(0)) {
+            delete _ownedToken[from];
+        }
+        if (from == address(0)) {
+            _ownedToken[to] = tokenId;
+        }
+        super._beforeTokenTransfers(from, to, tokenId, quantity);
     }
 
     /// @dev This function is not allowed because we want the token to be soulbound.
