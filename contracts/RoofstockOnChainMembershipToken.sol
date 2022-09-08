@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import 'erc721a-upgradeable/contracts/ERC721AUpgradeable.sol';
+import 'erc721a-upgradeable/contracts/extensions/ERC721AQueryableUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import './IKyc.sol';
 
@@ -9,11 +10,10 @@ error NotSupported();
 
 /// @title A soulbound token that you get once you KYC with Roofstock onChain that allows you to receive Home onChain tokens.
 /// @author Roofstock onChain team
-contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpgradeable {
+contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQueryableUpgradeable, OwnableUpgradeable {
     string private _baseTokenURI;
 
     mapping(address => bool) private kyc;
-    mapping(address => uint256) private _ownedToken;
 
     /// @notice Initializes the contract.
     function initialize()
@@ -101,17 +101,6 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
         kyc[_address] = isKyc;
     }
 
-    /// @notice Determines the token id for a user.
-    /// @param owner The address for which to get the token id.
-    /// @return The token id for the given address.
-    function tokenOfOwner(address owner)
-        public
-        view
-        returns (uint256)
-    {
-        return _ownedToken[owner];
-    }
-
     /// @notice Gets the base URI for all tokens.
     /// @return The token base URI.
     function _baseURI()
@@ -132,30 +121,11 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
         _baseTokenURI = baseTokenURI;
     }
 
-    /// @notice Override that happens before all transfers.
-    /// @dev Since this token is soulbound, it only happens on mint and burn
-    /// @param from The address the token is transferred from.
-    /// @param to The address the token is transferred to.
-    /// @param tokenId The id of the token.
-    /// @param quantity The number of tokens that are being transferred.
-    function _beforeTokenTransfers(address from, address to, uint256 tokenId, uint256 quantity)
-        internal
-        override
-    {
-        if (to == address(0)) {
-            delete _ownedToken[from];
-        }
-        if (from == address(0)) {
-            _ownedToken[to] = tokenId;
-        }
-        super._beforeTokenTransfers(from, to, tokenId, quantity);
-    }
-
     /// @dev This function is not allowed because we want the token to be soulbound.
     function transferFrom(address, address, uint256)
         public
         pure
-        override
+        override (ERC721AUpgradeable, IERC721AUpgradeable)
     {
         revert NotSupported();
     }
@@ -164,7 +134,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
     function safeTransferFrom(address, address, uint256, bytes memory)
         public
         pure
-        override
+        override (ERC721AUpgradeable, IERC721AUpgradeable)
     {
         revert NotSupported();
     }
@@ -173,7 +143,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
     function approve(address, uint256)
         public
         pure
-        override
+        override (ERC721AUpgradeable, IERC721AUpgradeable)
     {
         revert NotSupported();
     }
@@ -182,7 +152,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
     function getApproved(uint256)
         public
         pure
-        override
+        override (ERC721AUpgradeable, IERC721AUpgradeable)
         returns (address)
     {
         revert NotSupported();
@@ -192,7 +162,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
     function isApprovedForAll(address, address)
         public
         pure
-        override
+        override (ERC721AUpgradeable, IERC721AUpgradeable)
         returns (bool)
     {
         revert NotSupported();
@@ -202,7 +172,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, OwnableUpg
     function setApprovalForAll(address, bool)
         public
         pure
-        override
+        override (ERC721AUpgradeable, IERC721AUpgradeable)
     {
         revert NotSupported();
     }
