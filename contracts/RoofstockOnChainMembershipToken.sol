@@ -3,17 +3,21 @@ pragma solidity ^0.8.4;
 
 import 'erc721a-upgradeable/contracts/ERC721AUpgradeable.sol';
 import 'erc721a-upgradeable/contracts/extensions/ERC721AQueryableUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import './IKyc.sol';
 
 error NotSupported();
 
 /// @title A soulbound token that you get once you KYC with Roofstock onChain that allows you to receive Home onChain tokens.
 /// @author Roofstock onChain team
-contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQueryableUpgradeable, OwnableUpgradeable {
+contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQueryableUpgradeable, AccessControlUpgradeable {
     string private _baseTokenURI;
 
     mapping(address => bool) private kyc;
+
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
+    bytes32 public constant TOGGLE_KYC_ROLE = keccak256("TOGGLE_KYC_ROLE");
 
     /// @notice Initializes the contract.
     function initialize()
@@ -22,9 +26,14 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQue
         public
     {
         __ERC721A_init('Roofstock onChain Membership', 'RoCM');
-        __Ownable_init();
+        __AccessControl_init();
 
         _baseTokenURI = "https://onchain.roofstock.com/membership/metadata/";
+
+        _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _grantRole(MINTER_ROLE, _msgSender());
+        _grantRole(BURNER_ROLE, _msgSender());
+        _grantRole(TOGGLE_KYC_ROLE, _msgSender());
     }
 
     /// @notice Airdrops tokens to a list of accounts.
@@ -32,7 +41,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQue
     /// @param accounts The list of accounts that you want to drop new tokens to.
     function airdrop(address[] calldata accounts)
         external
-        onlyOwner
+        onlyRole(MINTER_ROLE)
     {
         for(uint i = 0; i < accounts.length; i++) {
             if (balanceOf(accounts[i]) == 0) {
@@ -55,7 +64,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQue
     /// @param to The address that will own the token after the mint is complete.
     function adminMint(address to)
         public
-        onlyOwner
+        onlyRole(MINTER_ROLE)
     {
         require(balanceOf(to) == 0, "RoofstockOnChainMembershipToken: This address is already a Roofstock onChain member.");
         _mint(to, 1);
@@ -75,7 +84,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQue
     /// @param tokenId The token ID to be burned.
     function adminBurn(uint256 tokenId)
         public
-        onlyOwner
+        onlyRole(BURNER_ROLE)
     {
         _burn(tokenId, false);
     }
@@ -96,7 +105,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQue
     /// @param isKyc Whether or not the address is KYC'd.
     function toggleKyc(address _address, bool isKyc)
         public
-        onlyOwner
+        onlyRole(TOGGLE_KYC_ROLE)
     {
         kyc[_address] = isKyc;
     }
@@ -116,7 +125,7 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQue
     /// @param baseTokenURI The new base URI.
     function setBaseURI(string memory baseTokenURI)
         public
-        onlyOwner
+        onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _baseTokenURI = baseTokenURI;
     }
@@ -175,5 +184,16 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQue
         override (ERC721AUpgradeable, IERC721AUpgradeable)
     {
         revert NotSupported();
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721AUpgradeable, IERC721AUpgradeable, AccessControlUpgradeable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }
