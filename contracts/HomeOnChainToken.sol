@@ -16,6 +16,8 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter private _tokenIdCounter;
 
+    address private _owner;
+
     string private _baseTokenURI;
     address private _kycContractAddress;
     event KycContractAddressChanged(address indexed kycContractAddress);
@@ -39,6 +41,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         __Pausable_init();
         __ERC721Burnable_init();
 
+        setOwner(_msgSender());
         _baseTokenURI = "https://onchain.roofstock.com/metadata/";
 
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -178,6 +181,25 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
         returns (bool)
     {
         return sellable[tokenId] > block.timestamp;
+    }
+
+    /// @notice Sets the owner of the contract.
+    /// @dev Can only be set by an admin.
+    function setOwner(address newOwner)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _owner = newOwner;
+    }
+
+    /// @notice Returns the address of the current owner.
+    /// @return The address of the current owner.
+    function owner()
+        external
+        view
+        returns (address)
+    {
+        return _owner;
     }
 
     // The following functions are overrides required by Solidity.
