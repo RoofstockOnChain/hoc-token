@@ -13,6 +13,8 @@ error NotSupported();
 contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQueryableUpgradeable, AccessControlUpgradeable {
     string private _baseTokenURI;
 
+    address private _owner;
+
     mapping(address => bool) private kyc;
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -128,6 +130,25 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQue
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _baseTokenURI = baseTokenURI;
+    }
+
+    /// @notice Sets the owner of the contract.
+    /// @dev Can only be set by an admin.
+    function setOwner(address newOwner)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _owner = newOwner;
+    }
+
+    /// @notice Returns the address of the current owner.
+    /// @return The address of the current owner.
+    function owner()
+        external
+        view
+        returns (address)
+    {
+        return _owner;
     }
 
     /// @dev This function is not allowed because we want the token to be soulbound.
