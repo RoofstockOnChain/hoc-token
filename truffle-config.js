@@ -22,6 +22,15 @@ module.exports = {
       },
       network_id: 4,
     },
+    goerli: {
+      provider: function () {
+        return new HDWalletProvider(
+          `${process.env.MNEMONIC}`,
+          `https://goerli.infura.io/v3/${process.env.INFURA_ID}`
+        );
+      },
+      network_id: 5,
+    },
     mainnet: {
       provider: function () {
         return new HDWalletProvider(
