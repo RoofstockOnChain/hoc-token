@@ -211,10 +211,18 @@ contract RoofstockOnChainMembershipToken is IKyc, ERC721AUpgradeable, ERC721AQue
 
     function supportsInterface(bytes4 interfaceId)
         public
-        view
+        pure
         override(ERC721AUpgradeable, IERC721AUpgradeable, AccessControlUpgradeable)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        // The interface IDs are constants representing the first 4 bytes
+        // of the XOR of all function selectors in the interface.
+        // See: [ERC165](https://eips.ethereum.org/EIPS/eip-165)
+        // (e.g. `bytes4(i.functionA.selector ^ i.functionB.selector ^ ...)`)
+        return
+            interfaceId == 0x01ffc9a7 || // ERC165 interface ID for ERC165.
+            interfaceId == 0x80ac58cd || // ERC165 interface ID for ERC721.
+            interfaceId == 0x5b5e139f || // ERC165 interface ID for ERC721Metadata.
+            interfaceId == 0x7965db0b; // ERC165 interface ID for AccessControl.
     }
 }
