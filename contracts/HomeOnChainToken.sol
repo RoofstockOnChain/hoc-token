@@ -18,7 +18,7 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
 
     address private _owner;
 
-    string private _baseTokenURI;
+    string public _baseTokenURI;
     address private _kycContractAddress;
     event KycContractAddressChanged(address indexed kycContractAddress);
 
