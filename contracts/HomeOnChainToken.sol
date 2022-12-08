@@ -14,11 +14,10 @@ import "./IKyc.sol";
 /// @author Roofstock onChain team
 contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableUpgradeable, AccessControlUpgradeable, PausableUpgradeable, ERC721BurnableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
+    /* DO NOT CHANGE THE ORDER OF THESE VARIABLES - BEGIN */
     CountersUpgradeable.Counter private _tokenIdCounter;
 
-    address private _owner;
-
-    string public _baseTokenURI;
+    string private _zachsLessonAboutStorageSlotsOnUpgradeableContracts;
     address private _kycContractAddress;
     event KycContractAddressChanged(address indexed kycContractAddress);
 
@@ -28,6 +27,10 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant SELLABLE_GRANTOR_ROLE = keccak256("SELLABLE_GRANTOR_ROLE");
+
+    address private _owner;
+    string private _baseTokenURI;
+    /* DO NOT CHANGE THE ORDER OF THESE VARIABLES - END */
 
     /// @notice Initializes the contract.
     /// @param kycContractAddress The default value of the KYC onChain Token contract address.
