@@ -13,15 +13,6 @@ module.exports = {
       port: 8545,
       network_id: "*",
     },
-    rinkeby: {
-      provider: function () {
-        return new HDWalletProvider(
-          `${process.env.MNEMONIC}`,
-          `https://rinkeby.infura.io/v3/${process.env.INFURA_ID}`
-        );
-      },
-      network_id: 4,
-    },
     goerli: {
       provider: function () {
         return new HDWalletProvider(
