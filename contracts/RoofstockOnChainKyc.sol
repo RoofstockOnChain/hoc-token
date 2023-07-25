@@ -4,13 +4,11 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@quadrata/contracts/interfaces/IQuadPassport.sol";
-import "@quadrata/contracts/utility/QuadReaderUtils.sol";
 import './IKyc.sol';
 
 /// @title Allows users to KYC/AML on Quadrata and acknowledge our documents on the blockchain.
 /// @author Roofstock onChain team
 contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
-    using QuadReaderUtils for bytes32;
 
     /* DO NOT CHANGE THE ORDER OF THESE VARIABLES - BEGIN */
     mapping(address => bool) private documentsAcknowledged;
@@ -32,6 +30,7 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
     }
 
     /// @notice Sets the contract address for the QuadPassport contract.
+    /// @dev Can only be called by contract administrator.
     /// @param quadPassportContractAddress The new QuadPassport contract address.
     function setQuadPassportContractAddress(address quadPassportContractAddress)
         public
@@ -82,6 +81,9 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
         return documentsAcknowledged[msg.sender];
     }
 
+    /// @notice Adds a verified recipient.
+    /// @dev Can only be called by contract administrator.
+    /// @param _address The address of the verified recipient that is to be added.
     function addVerifiedRecipient(address _address)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
@@ -90,6 +92,9 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
         verifiedRecipients[_address] = true;
     }
 
+    /// @notice Removes a verified recipient.
+    /// @dev Can only be called by contract administrator.
+    /// @param _address The address of the verified recipient that is to be removed.
     function removeVerifiedRecipient(address _address)
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
@@ -98,6 +103,9 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
         verifiedRecipients[_address] = false;
     }
 
+    /// @notice Checks to see if the address is a verified recipient.
+    /// @param _address The address that you want to check.
+    /// @return Whether the address is a verified recipient.
     function isVerifiedRecipient(address _address)
         public
         view
@@ -123,8 +131,22 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
             _address, 
             keccak256("AML")
         );
-        bool isEligibleCountry = countryAttribute.value.countryIsEqual("US");
-        bool isEligibleAML = amlAttribute.value.amlLessThan(5);
+        bool isEligibleCountry = countryIsEqual(countryAttribute.value, "US");
+        bool isEligibleAML = amlLessThanEqual(amlAttribute.value, 5);
         return isEligibleCountry && isEligibleAML;
+    }
+
+    /// @dev Checks if Country return value is equal to a given string value
+    /// @param _attrValue return value of query
+    /// @param _expectedString expected country value as string
+    function countryIsEqual(bytes32 _attrValue, string memory _expectedString) private pure returns (bool) {
+        return(_attrValue == keccak256(abi.encodePacked(_expectedString)));
+    }
+
+    /// @dev Checks if AML return value is less than or equal to a given uint256 value
+    /// @param _attrValue return value of query
+    /// @param _upperBound upper bound AML value as uint256
+    function amlLessThanEqual(bytes32 _attrValue, uint256 _upperBound) private pure returns (bool) {
+        return(uint256(_attrValue) <= _upperBound);
     }
 }
