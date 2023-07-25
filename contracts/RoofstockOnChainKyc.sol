@@ -9,7 +9,7 @@ import './IKyc.sol';
 
 /// @title Allows users to KYC/AML on Quadrata and acknowledge our documents on the blockchain.
 /// @author Roofstock onChain team
-contract QuadrataProxyKyc is Initializable, AccessControlUpgradeable, IKyc {
+contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
     using QuadReaderUtils for bytes32;
 
     /* DO NOT CHANGE THE ORDER OF THESE VARIABLES - BEGIN */
@@ -36,7 +36,7 @@ contract QuadrataProxyKyc is Initializable, AccessControlUpgradeable, IKyc {
         public
         onlyRole(DEFAULT_ADMIN_ROLE)
     {
-        require(quadPassportContractAddress != address(0), "QuadrataProxyKyc: QuadPassport smart contract address must exist");
+        require(quadPassportContractAddress != address(0), "RoofstockOnChainKyc: QuadPassport smart contract address must exist");
         _quadPassportContractAddress = quadPassportContractAddress;
         emit QuadPassportContractAddressChanged(quadPassportContractAddress);
     }
@@ -49,7 +49,7 @@ contract QuadrataProxyKyc is Initializable, AccessControlUpgradeable, IKyc {
         view
         returns(bool)
     {
-        require(_address != address(0), "QuadrataProxyKyc: Address must exist");
+        require(_address != address(0), "RoofstockOnChainKyc: Address must exist");
         bool _isIdentityVerified = isIdentityVerified(_address);
         return _isIdentityVerified && documentsAcknowledged[_address];
     }
@@ -62,7 +62,7 @@ contract QuadrataProxyKyc is Initializable, AccessControlUpgradeable, IKyc {
     function acknowledgeDocuments()
         public
     {
-        require(!documentsAcknowledged[msg.sender], "QuadrataProxyKyc: This address has already acknowleged the documents.");
+        require(!documentsAcknowledged[msg.sender], "RoofstockOnChainKyc: This address has already acknowleged the documents.");
         documentsAcknowledged[msg.sender] = true;
     }
 
