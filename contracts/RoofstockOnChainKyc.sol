@@ -14,26 +14,14 @@ contract RoofstockOnChainKyc is Ownable, IKyc {
     mapping(address => bool) public verifiedRecipients;
 
     address private _quadPassportContractAddress;
-    event QuadPassportContractAddressChanged(address indexed quadPassportContractAddress);
     /* DO NOT CHANGE THE ORDER OF THESE VARIABLES - END */
 
     /// @notice Initializes the contract.
     /// @param quadPassportContractAddress The default value of the QuadPassport contract address.
     constructor(address quadPassportContractAddress)
     {
-        setQuadPassportContractAddress(quadPassportContractAddress);
-    }
-
-    /// @notice Sets the contract address for the QuadPassport contract.
-    /// @dev Can only be called by contract owner.
-    /// @param quadPassportContractAddress The new QuadPassport contract address.
-    function setQuadPassportContractAddress(address quadPassportContractAddress)
-        public
-        onlyOwner
-    {
         require(quadPassportContractAddress != address(0), "RoofstockOnChainKyc: QuadPassport smart contract address must exist");
         _quadPassportContractAddress = quadPassportContractAddress;
-        emit QuadPassportContractAddressChanged(quadPassportContractAddress);
     }
 
     /// @notice Checks to see if the address has a token and is KYC'd.
