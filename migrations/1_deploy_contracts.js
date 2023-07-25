@@ -1,18 +1,18 @@
 const { deployProxy } = require("@openzeppelin/truffle-upgrades");
 
-const RoofstockOnChainMembershipToken = artifacts.require("RoofstockOnChainMembershipToken");
+const RoofstockOnChainKyc = artifacts.require("RoofstockOnChainKyc");
 const HomeOnChainToken = artifacts.require("HomeOnChainToken");
 
 module.exports = async function (deployer) {
-  // Deploy the Roofstock onChain Membership Token contract without the proxy
-  //await deployer.deploy(RoofstockOnChainMembershipToken);
+  const goerliQuadrataPassportContractAddress = "0x185cc335175B1E7E29e04A321E1873932379a4a0";
+  const mainnetQuadrataPassportContractAddress = "0x2e779749c40CC4Ba1cAB4c57eF84d90755CC017d";
 
-  // Deploy the Roofstock onChain Membership Token contract with the proxy
-  // const roofstockOnChainMembershipTokenContract = await deployProxy(RoofstockOnChainMembershipToken, [ ], { deployer });
+  // Deploy the RoofstockOnChainKyc contract without the proxy
+  // const roofstockOnChainKycContract = await deployer.deploy(RoofstockOnChainKyc, [ goerliQuadrataPassportContractAddress ]);
 
   // Deploy the Roofstock onChain Home onChain Token contract without the proxy
   // await deployer.deploy(HomeOnChainToken);
 
   // Deploy the Roofstock onChain Home onChain Token contract with the proxy
-  // await deployProxy(HomeOnChainToken, [ roofstockOnChainMembershipTokenContract.address ], { deployer });
+  // await deployProxy(HomeOnChainToken, [ roofstockOnChainKycContract.address ], { deployer });
 };

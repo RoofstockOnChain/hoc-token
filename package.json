@@ -13,9 +13,9 @@
     "test": "truffle test",
     "dashboard": "truffle dashboard",
     "verify:home-onchain-token:goerli": "truffle run verify HomeOnChainToken --network goerli",
-    "verify:roofstock-onchain-membership-token:goerli": "truffle run verify RoofstockOnChainMembershipToken --network goerli",
+    "verify:roofstock-onchain-kyc:goerli": "truffle run verify RoofstockOnChainKyc --network goerli",
     "verify:home-onchain-token:mainnet": "truffle run verify HomeOnChainToken --network mainnet",
-    "verify:roofstock-onchain-membership-token:mainnet": "truffle run verify RoofstockOnChainMembershipToken --network mainnet"
+    "verify:roofstock-onchain-kyc:mainnet": "truffle run verify RoofstockOnChainKyc --network mainnet"
   },
   "repository": {
     "type": "git",

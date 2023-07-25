@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@quadrata/contracts/interfaces/IQuadPassport.sol";
-import './IKyc.sol';
+import "./IKyc.sol";
 
 /// @title Allows users to KYC/AML on Quadrata and acknowledge our documents on the blockchain.
 /// @author Roofstock onChain team
-contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
+contract RoofstockOnChainKyc is Ownable, IKyc {
 
     /* DO NOT CHANGE THE ORDER OF THESE VARIABLES - BEGIN */
     mapping(address => bool) private documentsAcknowledged;
@@ -20,21 +19,17 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
 
     /// @notice Initializes the contract.
     /// @param quadPassportContractAddress The default value of the QuadPassport contract address.
-    function initialize(address quadPassportContractAddress)
-        initializer
-        public
+    constructor(address quadPassportContractAddress)
     {
-        __AccessControl_init();
-
         setQuadPassportContractAddress(quadPassportContractAddress);
     }
 
     /// @notice Sets the contract address for the QuadPassport contract.
-    /// @dev Can only be called by contract administrator.
+    /// @dev Can only be called by contract owner.
     /// @param quadPassportContractAddress The new QuadPassport contract address.
     function setQuadPassportContractAddress(address quadPassportContractAddress)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyOwner
     {
         require(quadPassportContractAddress != address(0), "RoofstockOnChainKyc: QuadPassport smart contract address must exist");
         _quadPassportContractAddress = quadPassportContractAddress;
@@ -82,22 +77,22 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
     }
 
     /// @notice Adds a verified recipient.
-    /// @dev Can only be called by contract administrator.
+    /// @dev Can only be called by contract owner.
     /// @param _address The address of the verified recipient that is to be added.
     function addVerifiedRecipient(address _address)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyOwner
     {
         require(!verifiedRecipients[_address], "RoofstockOnChainKyc: This address has already a verified recipient.");
         verifiedRecipients[_address] = true;
     }
 
     /// @notice Removes a verified recipient.
-    /// @dev Can only be called by contract administrator.
+    /// @dev Can only be called by contract owner.
     /// @param _address The address of the verified recipient that is to be removed.
     function removeVerifiedRecipient(address _address)
         public
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyOwner
     {
         require(verifiedRecipients[_address], "RoofstockOnChainKyc: This address is not a verified recipient.");
         verifiedRecipients[_address] = false;
