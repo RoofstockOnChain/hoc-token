@@ -14,6 +14,7 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
 
     /* DO NOT CHANGE THE ORDER OF THESE VARIABLES - BEGIN */
     mapping(address => bool) private documentsAcknowledged;
+    mapping(address => bool) public verifiedRecipients;
 
     address private _quadPassportContractAddress;
     event QuadPassportContractAddressChanged(address indexed quadPassportContractAddress);
@@ -50,6 +51,11 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
         returns(bool)
     {
         require(_address != address(0), "RoofstockOnChainKyc: Address must exist");
+        if (isVerifiedRecipient(_address))
+        {
+            return true;
+        }
+
         bool _isIdentityVerified = isIdentityVerified(_address);
         return _isIdentityVerified && documentsAcknowledged[_address];
     }
@@ -74,6 +80,30 @@ contract RoofstockOnChainKyc is Initializable, AccessControlUpgradeable, IKyc {
         returns(bool)
     {
         return documentsAcknowledged[msg.sender];
+    }
+
+    function addVerifiedRecipient(address _address)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        require(!verifiedRecipients[_address], "RoofstockOnChainKyc: This address has already a verified recipient.");
+        verifiedRecipients[_address] = true;
+    }
+
+    function removeVerifiedRecipient(address _address)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        require(verifiedRecipients[_address], "RoofstockOnChainKyc: This address is not a verified recipient.");
+        verifiedRecipients[_address] = false;
+    }
+
+    function isVerifiedRecipient(address _address)
+        public
+        view
+        returns(bool)
+    {
+        return verifiedRecipients[_address];
     }
 
     /// @notice Checks to see if the address has had it's identity verified on Quadrata.
