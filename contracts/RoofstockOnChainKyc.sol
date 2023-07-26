@@ -1,27 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@quadrata/contracts/interfaces/IQuadPassport.sol";
 import "./IKyc.sol";
 
 /// @title Allows users to KYC/AML on Quadrata and acknowledge our documents on the blockchain.
 /// @author Roofstock onChain team
-contract RoofstockOnChainKyc is Ownable, IKyc {
+contract RoofstockOnChainKyc is Initializable, OwnableUpgradeable, IKyc {
 
     /* DO NOT CHANGE THE ORDER OF THESE VARIABLES - BEGIN */
+    address private _quadPassportContractAddress;
+
     mapping(address => bool) private documentsAcknowledged;
     mapping(address => bool) public verifiedRecipients;
-
-    address private _quadPassportContractAddress;
     /* DO NOT CHANGE THE ORDER OF THESE VARIABLES - END */
 
     /// @notice Initializes the contract.
     /// @param quadPassportContractAddress The default value of the QuadPassport contract address.
-    constructor(address quadPassportContractAddress)
+    function initialize(address quadPassportContractAddress)
+        initializer
+        public
     {
         require(quadPassportContractAddress != address(0), "RoofstockOnChainKyc: QuadPassport smart contract address must exist");
         _quadPassportContractAddress = quadPassportContractAddress;
+
+        __Ownable_init();
     }
 
     /// @notice Checks to see if the address has a token and is KYC'd.
