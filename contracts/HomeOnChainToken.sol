@@ -129,15 +129,16 @@ contract HomeOnChainToken is Initializable, ERC721Upgradeable, ERC721EnumerableU
     /// @dev Verifies that the recipient owns a KYC onChain token (unless burning) and the token is sellable (unless minting).
     /// @param from The address where the token is coming from.
     /// @param to The address where the token is going to.
-    /// @param tokenId The id of the token
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+    /// @param firstTokenId The id of the token.
+    /// @param batchSize The batch size of the token transfer.
+    function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize)
         internal
         whenNotPaused
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
         require(to == address(0) || isAllowed(to), "HomeOnChainToken: To address must own a Roofstock onChain Membership token and be KYC'd. Go to https://onchain.roofstock.com/kyc for more details.");
-        require(from == address(0) || to == address(0) || isSellable(tokenId), "HomeOnChainToken: TokenId must be sellable. Go to https://onchain.roofstock.com/sell for more details.");
-        super._beforeTokenTransfer(from, to, tokenId);
+        require(from == address(0) || to == address(0) || isSellable(firstTokenId), "HomeOnChainToken: TokenId must be sellable. Go to https://onchain.roofstock.com/sell for more details.");
+        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
     }
 
     /// @notice Checks against the accompanied KYC onChain token contract.

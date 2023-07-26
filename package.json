@@ -34,14 +34,13 @@
   },
   "homepage": "https://github.com/RoofstockOnChain/hoc-token#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.2",
-    "@openzeppelin/contracts-upgradeable": "^4.6.0",
-    "@openzeppelin/truffle-upgrades": "^1.15.0",
+    "@openzeppelin/contracts": "^4.9.2",
+    "@openzeppelin/contracts-upgradeable": "^4.9.2",
+    "@openzeppelin/truffle-upgrades": "^1.19.0",
     "@quadrata/contracts": "^1.0.3",
-    "@truffle/hdwallet-provider": "^2.0.8",
-    "dotenv": "^16.0.1",
-    "erc721a-upgradeable": "^4.2.1",
-    "truffle": "^5.5.15",
-    "truffle-plugin-verify": "^0.5.25"
+    "@truffle/hdwallet-provider": "^2.1.13",
+    "dotenv": "^16.3.1",
+    "truffle": "^5.11.1",
+    "truffle-plugin-verify": "^0.5.33"
   }
 }
