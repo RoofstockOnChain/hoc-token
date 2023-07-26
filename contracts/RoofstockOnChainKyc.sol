@@ -73,13 +73,14 @@ contract RoofstockOnChainKyc is Initializable, OwnableUpgradeable, IKyc {
     }
 
     /// @notice Checks to see if the sender has acknowledged documents.
+    /// @param _address The address that you want to check.
     /// @return Whether the sender has acknowledged documents.
-    function hasAcknowlegedDocuments()
+    function hasAcknowlegedDocuments(address _address)
         public
         view
         returns(bool)
     {
-        return documentsAcknowledged[msg.sender];
+        return documentsAcknowledged[_address];
     }
 
     /// @notice Adds a verified recipient.
